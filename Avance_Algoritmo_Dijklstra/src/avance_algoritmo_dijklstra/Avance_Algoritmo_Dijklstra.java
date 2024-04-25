@@ -6,7 +6,7 @@ import java.util.*;
  */
 public class Avance_Algoritmo_Dijklstra {
     
-    public int distancia[] = new int [10]; //vector para almacenr distancias
+    public int distancia[] = new int [255]; //vector para almacenr distancias
     public static int costo[][] = new int [10][10]; //matriz cuadrada
     
     //Metodo para calcular la distancia más corta
@@ -37,35 +37,33 @@ public class Avance_Algoritmo_Dijklstra {
             if (this.distancia[minposition] + this.costo[minposition][k] < 
                     this.distancia[k] && flag[k] !=1){
                 this.distancia[k] = this.distancia[minposition]+ this.costo[minposition][k];
+                }
             }
         }
+    }
+            
+        public static void main(String args[]){
+        int nodos,origen,i,j;
 
-    /**
-     *
-     * @param args
-     */
-    public static void main(String args[]){
-        int nodes,source,i,j;
-        
         Scanner in = new Scanner(System.in);
         System.out.println("Inserte el numero de nodos: \n");
-        nodes = in.nextInt();
+        nodos = in.nextInt();
         Avance_Algoritmo_Dijklstra m = new Avance_Algoritmo_Dijklstra();
-        System.out.println("Inserte los pesos de la matriz: \n");
-        for(i=1;i<=nodes;i++)
-            for(j=1;j<=nodes;j++){
-                m.costo[i][j]=in.nextInt();
+        System.out.println("Inserte los pesos de la matriz: \n");  
+        //llenamos la matriz
+        for(i=1;i<=nodos;i++)
+            for(j=1;j<=nodos;j++){;
+                m.costo[i][j]=in.nextInt();//almacenmos cada peso fila por fila
                 if(m.costo[i][j]==0)
                     m.costo[i][j]=99;
             }
         System.out.println("Inserte el vértice de origen: ");
-        source = in.nextInt();
+        origen = in.nextInt();
         
-        m.calc(nodes,source);
-        System.out.println("El camino mas corto es: \t"+source+"\t Todos los demás vértices son: \n");
-        for(i=1;i<=nodes;i++)
-            if(i!=source)
-                 System.out.println("Fuente :"+source+"\t destino :"+i+"\t CostoMin :"+m.distancia[i]+"\t");
+        m.calc(nodos,origen);
+        System.out.println("El camino mas corto es: \t"+origen+"\t Todos los demás vértices son: \n");
+        for(i=1;i<=nodos;i++)
+            if(i!=origen)
+                 System.out.println("Fuente :"+origen+"\t destino :"+i+"\t CostoMin :"+m.distancia[i]+"\t");
     }
-    
-}
+}   
