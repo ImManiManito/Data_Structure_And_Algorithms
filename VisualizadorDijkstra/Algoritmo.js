@@ -1,80 +1,80 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const grid = document.getElementById("grid");
-  const startBtn = document.getElementById("startBtn");
-  const clearBtn = document.getElementById("clearBtn");
-  const numRows = 20;
-  const numCols = 20;
-  let startNode = null;
-  let endNode = null;
-  let isMouseDown = false;
+  const gridContainer = document.getElementById("grid");
+  const startButton = document.getElementById("startBtn");
+  const clearButton = document.getElementById("clearBtn");
+  const totalRows = 20;
+  const totalCols = 20;
+  let startCell = null;
+  let endCell = null;
+  let mouseIsDown = false;
 
   // Create the grid
-  for (let row = 0; row < numRows; row++) {
-    for (let col = 0; col < numCols; col++) {
+  for (let row = 0; row < totalRows; row++) {
+    for (let col = 0; col < totalCols; col++) {
       const cell = document.createElement("div");
       cell.dataset.row = row;
       cell.dataset.col = col;
-      grid.appendChild(cell);
+      gridContainer.appendChild(cell);
     }
   }
 
-  grid.addEventListener("mousedown", (e) => {
+  gridContainer.addEventListener("mousedown", (event) => {
     if (
-      e.target.dataset.row !== undefined &&
-      e.target.dataset.col !== undefined
+      event.target.dataset.row !== undefined &&
+      event.target.dataset.col !== undefined
     ) {
-      isMouseDown = true;
-      handleCellClick(e.target);
+      mouseIsDown = true;
+      handleCellClick(event.target);
     }
   });
 
-  grid.addEventListener("mouseover", (e) => {
+  gridContainer.addEventListener("mouseover", (event) => {
     if (
-      isMouseDown &&
-      e.target.dataset.row !== undefined &&
-      e.target.dataset.col !== undefined
+      mouseIsDown &&
+      event.target.dataset.row !== undefined &&
+      event.target.dataset.col !== undefined
     ) {
-      handleCellClick(e.target);
+      handleCellClick(event.target);
     }
   });
 
   document.addEventListener("mouseup", () => {
-    isMouseDown = false;
+    mouseIsDown = false;
   });
 
   function handleCellClick(cell) {
     const row = parseInt(cell.dataset.row);
     const col = parseInt(cell.dataset.col);
 
-    if (!startNode) {
+    if (!startCell) {
       cell.classList.add("start");
-      startNode = { row, col, element: cell };
-    } else if (!endNode && cell !== startNode.element) {
+      startCell = { row, col, element: cell };
+    } else if (!endCell && cell !== startCell.element) {
       cell.classList.add("end");
-      endNode = { row, col, element: cell };
-    } else if (cell !== startNode.element && cell !== endNode.element) {
+      endCell = { row, col, element: cell };
+    } else if (cell !== startCell.element && cell !== endCell.element) {
       cell.classList.toggle("wall");
     }
   }
 
-  startBtn.addEventListener("click", () => {
-    if (startNode && endNode) {
-      const path = dijkstra(startNode, endNode);
+  startButton.addEventListener("click", () => {
+    if (startCell && endCell) {
+      const path = dijkstraAlgorithm(startCell, endCell);
       if (path) {
         animatePath(path);
       }
     }
   });
 
-  clearBtn.addEventListener("click", () => {
-    startNode = null;
-    endNode = null;
-    grid.querySelectorAll("div").forEach((cell) => {
+  clearButton.addEventListener("click", () => {
+    startCell = null;
+    endCell = null;
+    gridContainer.querySelectorAll("div").forEach((cell) => {
       cell.className = "";
     });
   });
 
-  function dijkstra(start, end) {
+  function dijkstraAlgorithm(start, end) {
     const directions = [
       { row: -1, col: 0 },
       { row: 1, col: 0 },
@@ -82,32 +82,32 @@ document.addEventListener("DOMContentLoaded", () => {
       { row: 0, col: 1 },
     ];
 
-    const distance = Array.from({ length: numRows }, () =>
-      Array(numCols).fill(Infinity)
+    const distanceMatrix = Array.from({ length: totalRows }, () =>
+      Array(totalCols).fill(Infinity)
     );
-    const visited = Array.from({ length: numRows }, () =>
-      Array(numCols).fill(false)
+    const visitedMatrix = Array.from({ length: totalRows }, () =>
+      Array(totalCols).fill(false)
     );
-    const previous = Array.from({ length: numRows }, () =>
-      Array(numCols).fill(null)
+    const previousNodes = Array.from({ length: totalRows }, () =>
+      Array(totalCols).fill(null)
     );
 
     const priorityQueue = [{ node: start, dist: 0 }];
-    distance[start.row][start.col] = 0;
+    distanceMatrix[start.row][start.col] = 0;
 
     while (priorityQueue.length > 0) {
       priorityQueue.sort((a, b) => a.dist - b.dist);
       const { node, dist } = priorityQueue.shift();
 
-      if (visited[node.row][node.col]) continue;
-      visited[node.row][node.col] = true;
+      if (visitedMatrix[node.row][node.col]) continue;
+      visitedMatrix[node.row][node.col] = true;
 
       if (node.row === end.row && node.col === end.col) {
         const path = [];
         let currentNode = end;
         while (currentNode) {
           path.unshift(currentNode);
-          currentNode = previous[currentNode.row][currentNode.col];
+          currentNode = previousNodes[currentNode.row][currentNode.col];
         }
         return path;
       }
@@ -118,23 +118,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (
           newRow >= 0 &&
-          newRow < numRows &&
+          newRow < totalRows &&
           newCol >= 0 &&
-          newCol < numCols &&
-          !visited[newRow][newCol] &&
-          !grid
+          newCol < totalCols &&
+          !visitedMatrix[newRow][newCol] &&
+          !gridContainer
             .querySelector(`[data-row='${newRow}'][data-col='${newCol}']`)
             .classList.contains("wall")
         ) {
           const newDist = dist + 1;
-          if (newDist < distance[newRow][newCol]) {
-            distance[newRow][newCol] = newDist;
-            previous[newRow][newCol] = node;
+          if (newDist < distanceMatrix[newRow][newCol]) {
+            distanceMatrix[newRow][newCol] = newDist;
+            previousNodes[newRow][newCol] = node;
             priorityQueue.push({
               node: {
                 row: newRow,
                 col: newCol,
-                element: grid.querySelector(
+                element: gridContainer.querySelector(
                   `[data-row='${newRow}'][data-col='${newCol}']`
                 ),
               },
@@ -150,10 +150,11 @@ document.addEventListener("DOMContentLoaded", () => {
   function animatePath(path) {
     path.forEach((node, index) => {
       setTimeout(() => {
-        if (node !== startNode && node !== endNode) {
+        if (node !== startCell && node !== endCell) {
           node.element.classList.add("path");
         }
       }, 50 * index);
     });
   }
 });
+
