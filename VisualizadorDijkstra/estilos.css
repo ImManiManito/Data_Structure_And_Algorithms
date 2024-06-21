@@ -26,7 +26,7 @@ header {
   gap: 20px;
 }
 
-#grid {
+#gridContainer {
   display: grid;
   grid-template-columns: repeat(20, 25px);
   grid-template-rows: repeat(20, 25px);
@@ -35,31 +35,30 @@ header {
   margin-bottom: 20px;
 }
 
-#grid div {
+#gridContainer div {
   width: 25px;
   height: 25px;
   background-color: white;
   border: 1px solid #ddd;
 }
 
-#grid div.start {
+#gridContainer div.start {
   background-color: red;
   color: white;
 }
 
-#grid div.end {
+#gridContainer div.end {
   background-color: green;
   color: black;
 }
 
-#grid div.wall {
+#gridContainer div.wall {
   background-color: black;
 }
 
-#grid div.path {
+#gridContainer div.path {
   background-color: blue;
 }
-
 
 .buttons {
   display: flex;
@@ -76,4 +75,3 @@ button {
   border-radius: 20px;
   cursor: pointer;
 }
-
